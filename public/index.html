@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NotebookLM Prompt Generator</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#4f46e5',
+                        secondary: '#06b6d4'
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <!-- Header -->
+    <header class="bg-white shadow-sm border-b">
+        <div class="max-w-4xl mx-auto px-4 py-6">
+            <h1 class="text-3xl font-bold text-gray-900">NotebookLM Prompt Generator</h1>
+            <p class="text-gray-600 mt-2">Transform your learning topics into focused research and podcast prompts</p>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="max-w-4xl mx-auto px-4 py-8">
+        <!-- Step 1: Topic Input -->
+        <div id="step1" class="bg-white rounded-lg shadow-sm border p-6 mb-6">
+            <div class="flex items-center mb-4">
+                <span class="bg-primary text-white rounded-full w-8 h-8 flex items-center justify-center text-sm font-bold mr-3">1</span>
+                <h2 class="text-xl font-semibold text-gray-900">What do you want to learn?</h2>
+            </div>
+            <div class="space-y-4">
+                <textarea 
+                    id="topicInput" 
+                    placeholder="Enter your learning topic (e.g., 'the history of jazz fusion', 'quantum computing fundamentals', 'sustainable agriculture practices')"
+                    class="w-full p-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent resize-none"
+                    rows="3"
+                ></textarea>
+                <button 
+                    id="nextBtn" 
+                    class="bg-primary text-white px-6 py-2 rounded-lg hover:bg-primary/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    disabled
+                >
+                    Generate Questions →
+                </button>
+            </div>
+        </div>
+
+        <!-- Step 2: Clarification Questions -->
+        <div id="step2" class="bg-white rounded-lg shadow-sm border p-6 mb-6 hidden">
+            <div class="flex items-center mb-4">
+                <span class="bg-primary text-white rounded-full w-8 h-8 flex items-center justify-center text-sm font-bold mr-3">2</span>
+                <h2 class="text-xl font-semibold text-gray-900">Help us focus your learning</h2>
+            </div>
+            <p class="text-gray-600 mb-6">AI-generated questions tailored to your specific topic to create more targeted prompts.</p>
+            <div id="clarificationQuestions" class="space-y-4">
+                <!-- AI-generated questions will be inserted here dynamically -->
+            </div>
+            <div class="flex gap-3 mt-6">
+                <button 
+                    id="backBtn" 
+                    class="border border-gray-300 text-gray-700 px-6 py-2 rounded-lg hover:bg-gray-50 transition-colors"
+                >
+                    ← Back
+                </button>
+                <button 
+                    id="generateBtn" 
+                    class="bg-primary text-white px-6 py-2 rounded-lg hover:bg-primary/90 transition-colors"
+                >
+                    Generate Prompts
+                </button>
+            </div>
+        </div>
+
+        <!-- Step 3: Results -->
+        <div id="step3" class="hidden">
+            <div class="flex items-center mb-6">
+                <span class="bg-primary text-white rounded-full w-8 h-8 flex items-center justify-center text-sm font-bold mr-3">3</span>
+                <h2 class="text-xl font-semibold text-gray-900">Your NotebookLM Prompts</h2>
+            </div>
+            
+            <!-- Results Grid -->
+            <div class="grid md:grid-cols-2 gap-6 mb-6">
+                <!-- Discover Sources -->
+                <div class="bg-white rounded-lg shadow-sm border p-6">
+                    <h3 class="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+                        <span class="bg-secondary text-white rounded-full w-6 h-6 flex items-center justify-center text-sm font-bold mr-2">A</span>
+                        Discover Sources Prompts
+                    </h3>
+                    <p class="text-sm text-gray-600 mb-4">Detailed research prompts to guide your source discovery in NotebookLM. Each module provides specific direction on what to research and what insights to look for.</p>
+                    <div id="discoverSourcesList" class="space-y-2">
+                        <!-- Prompts will be inserted here -->
+                    </div>
+                </div>
+
+                <!-- Create Podcast -->
+                <div class="bg-white rounded-lg shadow-sm border p-6">
+                    <h3 class="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+                        <span class="bg-green-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-sm font-bold mr-2">B</span>
+                        Create Podcast Prompts
+                    </h3>
+                    <p class="text-sm text-gray-600 mb-4">Comprehensive prompts for NotebookLM's Audio Overview feature. Each module includes specific guidance on content, audience, and key concepts to highlight.</p>
+                    <div id="createPodcastList" class="space-y-2">
+                        <!-- Prompts will be inserted here -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- New Topic Button -->
+            <div class="text-center">
+                <button 
+                    id="newTopicBtn" 
+                    class="border border-gray-300 text-gray-700 px-6 py-2 rounded-lg hover:bg-gray-50 transition-colors"
+                >
+                    Generate for New Topic
+                </button>
+            </div>
+        </div>
+
+        <!-- Loading State -->
+        <div id="loading" class="hidden text-center py-12">
+            <div class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+            <p class="text-gray-600 mt-4">Generating your content...</p>
+        </div>
+
+        <!-- Error State -->
+        <div id="error" class="hidden bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
+            <div class="flex">
+                <div class="flex-shrink-0">
+                    <svg class="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
+                    </svg>
+                </div>
+                <div class="ml-3">
+                    <h3 class="text-sm font-medium text-red-800">Error</h3>
+                    <div class="mt-2 text-sm text-red-700">
+                        <p id="errorMessage">Something went wrong. Please try again.</p>
+                    </div>
+                    <div class="mt-4">
+                        <button id="retryBtn" class="bg-red-100 text-red-800 px-3 py-1 rounded text-sm hover:bg-red-200 transition-colors">
+                            Try Again
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="script.js"></script>
+</body>
+</html> 
